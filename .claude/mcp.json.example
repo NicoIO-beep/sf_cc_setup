@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "atlassian-mcp-server": {
+      "command": "C:\\Users\\YourName\\.local\\bin\\uvx.exe",
+      "args": [
+        "mcp-atlassian",
+        "--jira-url", "https://10.76.1.90",
+        "--jira-personal-token", "YOUR_JIRA_PAT_HERE",
+        "--no-jira-ssl-verify"
+      ],
+      "env": {}
+    }
+  }
+}

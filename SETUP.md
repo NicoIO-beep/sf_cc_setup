@@ -208,6 +208,96 @@ You're ready.
 
 ---
 
+## Step 11: Set Up Jira MCP (optional — connects Claude to Jira)
+
+This lets Claude read and create Jira tickets directly inside your session.
+
+### 11a: Check & Install uvx
+
+**Check first:**
+```bash
+uvx --version
+```
+→ Shows a version? **Skip to 11b.**
+→ `command not found`? Install:
+
+```powershell
+irm https://astral.sh/uv/install.ps1 | iex
+```
+
+Then close and reopen your terminal. Verify:
+```bash
+uvx --version
+```
+
+> No admin rights needed — installs to `C:\Users\YourName\.local\bin\`.
+
+---
+
+### 11b: Create your Jira Personal Access Token (PAT)
+
+1. Open Jira in your browser (you must be in the office or on VPN)
+2. Click your avatar (top right) → **Profile**
+3. Left sidebar → **Personal Access Tokens** → **Create token**
+4. Give it a name (e.g. `claude-code`), no expiry, click **Create**
+5. **Copy the token now** — it will not be shown again
+
+---
+
+### 11c: Create your MCP config file
+
+```bash
+# Copy the example (from repo root)
+cp .claude/mcp.json.example .claude/mcp.json
+```
+
+Then open `.claude/mcp.json` and:
+- Replace `YourName` with your Windows username
+- Replace `YOUR_JIRA_PAT_HERE` with the token from 11b
+
+> ⚠️ `.claude/mcp.json` is in `.gitignore` — your token stays local and is never committed.
+
+---
+
+### 11d: Enable project MCP servers in Claude Code
+
+**Check first — is this already set?**
+```bash
+grep -r "enableAllProjectMcpServers" ~/.claude/settings.json
+```
+→ Shows `true`? **Skip — already enabled.**
+→ Not found? Add it:
+
+Open `~/.claude/settings.json` (create if missing) and add:
+```json
+{
+  "enableAllProjectMcpServers": true
+}
+```
+
+---
+
+### 11e: Verify
+
+Start Claude Code:
+```bash
+claude
+```
+
+In the bottom status bar of VS Code, you should see **`atlassian-mcp-server: connected`**.
+
+Test it by asking:
+```
+list my open Jira tickets from the current sprint
+```
+
+> **Tip:** If you see `atlassian-mcp-server: failed`, check that:
+> - Your PAT is correct and not expired
+> - You are in the office or on VPN (Jira is only reachable internally)
+> - The path to `uvx.exe` matches your username in `.claude/mcp.json`
+
+---
+
 ## Troubleshooting
 
 **`sf: command not found` after install**

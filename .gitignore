@@ -14,3 +14,6 @@ Thumbs.db
 # IDE
 .vscode/settings.json
 .idea/
+
+# MCP credentials — copy from .claude/mcp.json.example and fill in your PAT
+.claude/mcp.json
