@@ -18,13 +18,16 @@ Clone this repo into your Salesforce project and get 3 specialized AI skills out
 
 ## Setup
 
-### 1. Clone into your project root
+### 1. Copy into your Salesforce project root
 ```bash
+# Option A: clone directly into your project
 git clone https://github.com/NicoIO-beep/sf_cc_setup.git .
-```
-Or copy `CLAUDE.md` and `.claude/` into an existing project.
 
-### 2. Adapt the org aliases
+# Option B: copy into an existing project
+cp -r sf_cc_setup/CLAUDE.md sf_cc_setup/.claude your-project/
+```
+
+### 2. Replace the org aliases
 
 Open `CLAUDE.md` and the 3 skill files and replace the sandbox aliases with your own:
 
@@ -39,15 +42,16 @@ grep -rl "ClaudeTest" . | xargs sed -i 's/ClaudeTest/YOUR_DEV_ALIAS/g'
 grep -rl "nicosb1" . | xargs sed -i 's/nicosb1/YOUR_UAT_ALIAS/g'
 ```
 
-### 3. Open Claude Code and use the skills
+### 3. Start Claude Code and use the skills
 ```bash
 claude
 ```
-Then invoke a skill:
+
+Then type a skill command followed by your task:
 ```
-/build   → Write me an Apex trigger for Account
-/data    → SOQL query for all open Opportunities this quarter
-/deploy  → Deploy AccountTrigger from dev to UAT
+/build   Write me an Apex trigger for Account
+/data    SOQL query for all open Opportunities this quarter
+/deploy  Deploy AccountTrigger from dev to UAT
 ```
 
 ## Security notes
