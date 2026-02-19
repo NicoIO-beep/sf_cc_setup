@@ -235,3 +235,19 @@ sf data query --query "SELECT Id, Active, Description FROM ValidationRule WHERE 
 - Retrieve metadata before editing locally — never edit blind
 - After every org-changing operation: update `.deployments/[TICKET-NR].md`
 - If no ticket number was provided: ask for one before proceeding with org changes
+
+---
+
+## Windows Compatibility Notes
+
+Most team members are on **Windows without admin rights**. Keep this in mind:
+
+- **SOQL with special characters** (e.g. `|`, `>`) can break in PowerShell. Write them to an Apex Anonymous file and run with `sf apex run --file`:
+  ```bash
+  # Instead of inline SOQL in PowerShell, use a script file:
+  sf apex run --file scripts/apex/myQuery.apex -o DEV_SANDBOX
+  ```
+- **CSV line endings**: Windows saves files with CRLF (`\r\n`). The bulk import API expects LF. If bulk imports fail on row 1, use Apex Anonymous as alternative for small datasets.
+- **Path separators**: Always use forward slashes (`/`) in `sf` CLI commands even on Windows — the SF CLI handles this correctly.
+- **`force-app/` doesn't exist yet?** Run first-time setup: see `SETUP.md` in the repo root.
+- **`sf` not found?** No admin install needed — see `SETUP.md` for the portable install option.

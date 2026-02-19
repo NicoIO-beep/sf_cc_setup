@@ -235,3 +235,17 @@ sf apex run --file scripts/apex/insertRecords.apex -o DEV_SANDBOX
 - Never use real PII — always anonymize or use synthetic data
 - DML operations on significant datasets (bulk insert, upsert, delete) that are part of a ticket: log to `.deployments/[TICKET-NR].md`
 - Read-only operations (SOQL, reports, exports, data quality checks) do NOT need manifest entries
+
+---
+
+## Windows Compatibility Notes
+
+Most team members are on **Windows without admin rights**. Keep this in mind:
+
+- **SOQL in PowerShell**: Special characters (`|`, `>`, `"`) can cause issues. Wrap queries in single quotes or use an Apex script file:
+  ```bash
+  sf apex run --file scripts/apex/myQuery.apex -o DEV_SANDBOX
+  ```
+- **CSV line endings (CRLF)**: Windows saves with `\r\n`. Bulk import may fail on row 1. Fix: open the CSV in Notepad++, change to Unix (LF) line endings and save. Or use Apex Anonymous for small datasets.
+- **Redirecting output to file** (`> export.csv`) works in both PowerShell and Git Bash. Prefer Git Bash if you see encoding issues.
+- **`sf` not found?** No admin install needed — see `SETUP.md` for the portable install option.

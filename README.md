@@ -66,3 +66,6 @@ Then type a skill command followed by your task:
 - [Claude Code](https://claude.ai/claude-code)
 - [Salesforce CLI](https://developer.salesforce.com/tools/salesforcecli) (`sf`)
 - Authenticated org connections (`sf org login web --alias YOUR_ALIAS`)
+
+**New to this setup? No Salesforce DX project yet? On Windows without admin rights?**
+→ Read [SETUP.md](SETUP.md) for step-by-step instructions.
