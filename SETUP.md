@@ -187,6 +187,8 @@ grep -rl "DEV_SANDBOX" . --include="*.md" | xargs sed -i 's/DEV_SANDBOX/YOUR_DEV
 grep -rl "UAT_SANDBOX" . --include="*.md" | xargs sed -i 's/UAT_SANDBOX/YOUR_UAT_ALIAS/g'
 ```
 
+> **Windows note:** `sed -i` in Git Bash on Windows can behave differently depending on the Git installation — it may create backup files or fail silently. If the replacement doesn't work, use the **PowerShell variant above** — it is the safer choice on Windows.
+
 ---
 
 ## Step 10: Start Claude Code

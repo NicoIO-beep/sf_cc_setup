@@ -2,7 +2,7 @@
 name: sf-deploy
 description: "Salesforce deployments, metadata transfers, sandbox management and security audits. Use this skill when the user wants to deploy between orgs, validate metadata, refresh or clone a sandbox, check who has access to what, review login history or run a compliance/security analysis. Do not use for writing code (use /build) or data imports (use /data)."
 user-invokable: true
-disable-model-invocation: true
+disable-model-invocation: false
 ---
 
 # sf-deploy — Salesforce Deploy & Audit
@@ -245,6 +245,35 @@ sf project deploy start --manifest destructiveChanges.xml -o DEV_SANDBOX --test-
 
 **`sf org list auth: No orgs found`**
 → Re-authenticate: `sf org login web --alias DEV_SANDBOX`. Check VPN if org is not reachable.
+
+---
+
+## 5. Org Health Check
+
+Quick checks to get an overview of org health — run these before a deployment or on request.
+
+### Test Coverage Overview
+```bash
+# Classes below 75% coverage
+sf data query --query "SELECT ApexClassOrTrigger.Name, NumLinesCovered, NumLinesUncovered FROM ApexCodeCoverageAggregate WHERE NumLinesUncovered > 0 ORDER BY NumLinesUncovered DESC LIMIT 20" --use-tooling-api -o DEV_SANDBOX
+```
+
+### Apex Exceptions (last 7 days)
+```bash
+sf data query --query "SELECT ExceptionType, Message, StackTrace, CreatedDate FROM ApexLog WHERE LogLength > 0 AND CreatedDate = LAST_N_DAYS:7 ORDER BY CreatedDate DESC LIMIT 20" --use-tooling-api -o DEV_SANDBOX
+```
+
+### Open / Stuck Bulk Jobs
+```bash
+sf data query --query "SELECT Id, Operation, Object, State, NumberRecordsFailed, CreatedDate FROM AsyncApexJob WHERE Status IN ('Queued','Processing','Holding') ORDER BY CreatedDate DESC LIMIT 20" -o DEV_SANDBOX
+```
+
+### Failed Scheduled Jobs
+```bash
+sf data query --query "SELECT Id, ApexClass.Name, Status, NumberOfErrors, NextFireTime FROM CronTrigger WHERE Status != 'COMPLETE' LIMIT 20" -o DEV_SANDBOX
+```
+
+> These are read-only checks — no changes are made. Run before any production deploy to confirm org is stable.
 
 ---
 

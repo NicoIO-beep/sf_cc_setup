@@ -2,7 +2,7 @@
 name: sf-data
 description: "Salesforce data operations: SOQL queries, CSV imports, data exports, SFDMU migrations, Data Loader and data quality analysis. Use this skill when the user wants to query records, import or export data, move data between orgs, fix duplicates, find missing fields or analyze data quality. Also when writing a SOQL query for a report or ad-hoc analysis. Do not use for building Apex or config (use /build) or deployments (use /deploy)."
 user-invokable: true
-disable-model-invocation: true
+disable-model-invocation: false
 ---
 
 # sf-data — Salesforce Data Operations
@@ -101,6 +101,15 @@ sf data bulk results --job-id [JOB_ID] -o DEV_SANDBOX
 ```bash
 sf plugins install sfdmu
 ```
+
+> **Version note:** `sf sfdmu run` is the current command for SF CLI v2+. If you get `command not found`, check your installed version:
+> ```bash
+> sf plugins list | grep sfdmu
+> ```
+> For older installations using `sfdx` instead of `sf`, the command is `sfdx sfdmu:run`. Pin a specific version if you need reproducibility:
+> ```bash
+> sf plugins install sfdmu@x.x.x
+> ```
 
 ### export.json (basic setup)
 ```json

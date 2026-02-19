@@ -2,7 +2,7 @@
 name: sf-build
 description: "Salesforce build and configure: Apex classes, triggers, LWC, Flows, validation rules, picklists, page layouts, user management and permission sets. Use this skill when the user wants to build, create, write or change anything in Salesforce — code or declarative config. Also when debugging Apex, fixing a Flow, or setting up users. Do not use for data imports (use /data) or deployments (use /deploy)."
 user-invokable: true
-disable-model-invocation: true
+disable-model-invocation: false
 ---
 
 # sf-build — Salesforce Build & Configure
