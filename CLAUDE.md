@@ -58,6 +58,40 @@ ClaudeTest → nicosb1 (Team Lead) → Production (Team Lead)
 
 ---
 
+### Deployment Tracking
+
+When you make changes that modify Salesforce metadata (Apex, Triggers, LWC, Flows, Fields, Layouts, Validation Rules, Permission Sets, Record Types), log them to a deployment manifest.
+
+**Applies to org-changing operations only — NOT to read-only operations (SOQL, reports, exports, data quality checks).**
+
+**File:** `.deployments/[TICKET-NR].md`
+If no ticket number was given: ask for one.
+If the user says there is no ticket: use `.deployments/NOTIX-YYYY-MM-DD-[short-description].md`.
+
+**Manifest template:**
+```
+# [TICKET-NR]: [Short description]
+**Status:** In Development | Ready for Staging | Deployed to Staging | Ready for Production | Done
+**Last updated:** [YYYY-MM-DD HH:MM]
+
+## Components
+- [MetadataType]: [ComponentName]
+
+## Deploy Order & Dependencies
+- [Which component must be deployed first and why — omit if no dependencies]
+
+## Changes
+- [YYYY-MM-DD] [What was changed and why]
+```
+
+**Rules:**
+- Append to existing manifest if the ticket file already exists — never overwrite
+- Always update "Last updated" and "Components" after each change
+- Never delete existing entries in "Changes" — only append
+- 💡 This is a transitional convenience tool — the org is always the real source of truth. If a manifest seems incomplete, verify against the org directly.
+
+---
+
 ## Skills
 
 Use these skills for specialized tasks — just type the command:

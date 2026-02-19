@@ -233,3 +233,5 @@ sf apex run --file scripts/apex/insertRecords.apex -o ClaudeTest
 - Use `--result-format csv` for exports that go into Excel
 - Cross-object queries: warn if result set approaches 50,000 rows
 - Never use real PII — always anonymize or use synthetic data
+- DML operations on significant datasets (bulk insert, upsert, delete) that are part of a ticket: log to `.deployments/[TICKET-NR].md`
+- Read-only operations (SOQL, reports, exports, data quality checks) do NOT need manifest entries

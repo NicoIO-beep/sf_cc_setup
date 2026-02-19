@@ -233,3 +233,5 @@ sf data query --query "SELECT Id, Active, Description FROM ValidationRule WHERE 
 - Test classes: use `@TestSetup`, assert with `Assert.areEqual()` (not `System.assertEquals`)
 - Before deactivating users or deleting records: ask for confirmation
 - Retrieve metadata before editing locally — never edit blind
+- After every org-changing operation: update `.deployments/[TICKET-NR].md`
+- If no ticket number was provided: ask for one before proceeding with org changes

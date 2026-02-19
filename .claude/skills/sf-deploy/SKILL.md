@@ -27,6 +27,34 @@ Production deploys are NEVER done by Claude — team lead only.
 
 ---
 
+## 0. Pre-Deployment: Check the Manifest
+
+Before deploying, check if manifest files exist:
+
+```bash
+ls .deployments/
+```
+
+### Deploy a specific ticket
+When a user says "deploy SFS-1234 to staging":
+1. Read `.deployments/SFS-1234.md` if it exists
+2. Show the component list and deploy order to the user
+3. If no manifest exists: ask the user what should be deployed — do not guess
+4. Validate first (`--dry-run`), then deploy in the correct order
+5. After successful deploy: update Status in the manifest to "Deployed to Staging"
+
+### Deployment overview (for Deployment Manager)
+When a user asks "what's ready for production" or "show open deployments":
+1. Scan `.deployments/` for Status "Deployed to Staging" or "Ready for Production"
+2. Show a summary table: Ticket | Description | Components | Status
+3. If deploying multiple tickets: check for conflicts (same component in multiple tickets)
+4. Show the full deploy plan and ask for confirmation
+5. After successful deploy: update Status to "Done" in each manifest
+
+> ⚠️ The manifest is a guide, not a guarantee. Always verify against the actual org state before production deploys — the org is the real source of truth.
+
+---
+
 ## 1. Deployment Workflow
 
 ### Step 1: Validate (Dry Run)
@@ -228,3 +256,6 @@ sf project deploy start --manifest destructiveChanges.xml -o ClaudeTest --test-l
 - For destructive changes: show what will be deleted, ask for confirmation
 - Retrieve metadata before overwriting — never deploy blind
 - Security audits are read-only — never change permissions without explicit request
+- Check `.deployments/` before deploying — if no manifest exists, ask the user what to deploy
+- After every successful deployment: update the manifest Status field
+- If the same component appears in multiple ticket manifests: flag the conflict before deploying
