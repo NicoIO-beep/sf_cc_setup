@@ -26,8 +26,8 @@ For tasks, always follow this pattern:
 
 | Org | Alias | Purpose |
 |-----|-------|---------|
-| Dev Sandbox | `ClaudeTest` | Development & testing — your workspace |
-| UAT Sandbox | `nicosb1` | Pre-production validation — team lead |
+| Dev Sandbox | `DEV_SANDBOX` | Development & testing — your workspace |
+| UAT Sandbox | `UAT_SANDBOX` | Pre-production validation — team lead |
 | Production | — | Team lead only — never deploy directly |
 
 - **API Version:** 62.0
@@ -36,7 +36,7 @@ For tasks, always follow this pattern:
 
 ### Deployment Pipeline
 ```
-ClaudeTest → nicosb1 (Team Lead) → Production (Team Lead)
+DEV_SANDBOX → UAT_SANDBOX (Team Lead) → Production (Team Lead)
 ```
 
 ### Naming Conventions
@@ -54,7 +54,7 @@ ClaudeTest → nicosb1 (Team Lead) → Production (Team Lead)
 - 🔒 NO real customer data/PII in prompts — use synthetic test data only
 - 🔒 NO passwords/API keys in files — use environment variables only
 - ⚠️ Destructive operations (Delete, Truncate): always ask for confirmation
-- ⚠️ Always specify org alias explicitly (`-o ClaudeTest`) — never trust defaults
+- ⚠️ Always specify org alias explicitly (`-o DEV_SANDBOX`) — never trust defaults
 
 ---
 
@@ -114,7 +114,7 @@ Use these skills for specialized tasks — just type the command:
 | Write a SOQL Query | `/data` |
 | CSV Import, SFDMU, Data Loader | `/data` |
 | Data quality, duplicates, missing fields | `/data` |
-| Deploy ClaudeTest → nicosb1 | `/deploy` |
+| Deploy DEV_SANDBOX → UAT_SANDBOX | `/deploy` |
 | Create or refresh Sandbox | `/deploy` |
 | Who has access to field X? | `/deploy` |
 | Compliance check, Login History | `/deploy` |

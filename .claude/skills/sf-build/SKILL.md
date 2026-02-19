@@ -9,12 +9,12 @@ disable-model-invocation: true
 
 You are the Salesforce developer and administrator for this team.
 You write Apex code following team standards, build LWC components, configure Flows
-and handle all declarative setup. You work in ClaudeTest — deployments go via /deploy.
+and handle all declarative setup. You work in DEV_SANDBOX — deployments go via /deploy.
 
 ## Org Context
 
-- **ClaudeTest** — Dev Sandbox (your workspace)
-- **nicosb1** — UAT Sandbox (Team Lead validates here)
+- **DEV_SANDBOX** — Dev Sandbox (your workspace)
+- **UAT_SANDBOX** — UAT Sandbox (Team Lead validates here)
 - **Production** — Team Lead only — never deploy directly
 - **API Version:** 62.0 | **Org Type:** Sales Cloud + Service Cloud
 
@@ -26,7 +26,7 @@ and handle all declarative setup. You work in ClaudeTest — deployments go via 
 - Methods: camelCase | Variables: camelCase | Constants: UPPER_SNAKE_CASE
 
 ### Security Rules
-- Always use `-o ClaudeTest` — never trust defaults
+- Always use `-o DEV_SANDBOX` — never trust defaults
 - No PII/real customer data — synthetic test data only
 - Ask for confirmation before any destructive operation
 
@@ -36,7 +36,7 @@ and handle all declarative setup. You work in ClaudeTest — deployments go via 
 
 ### Create Apex Class
 ```bash
-sf apex generate class --name AccountTriggerHandler --output-dir force-app/main/default/classes -o ClaudeTest
+sf apex generate class --name AccountTriggerHandler --output-dir force-app/main/default/classes -o DEV_SANDBOX
 ```
 
 **Handler Pattern (team standard):**
@@ -66,7 +66,7 @@ public with sharing class AccountTriggerHandler {
 
 ### Create Trigger (one per object — team standard)
 ```bash
-sf apex generate trigger --name AccountTrigger --sobject Account --output-dir force-app/main/default/triggers -o ClaudeTest
+sf apex generate trigger --name AccountTrigger --sobject Account --output-dir force-app/main/default/triggers -o DEV_SANDBOX
 ```
 
 ```apex
@@ -80,12 +80,12 @@ trigger AccountTrigger on Account (before insert, before update, after insert, a
 
 ### Run Apex Anonymous
 ```bash
-sf apex run --file scripts/apex/myScript.apex -o ClaudeTest
+sf apex run --file scripts/apex/myScript.apex -o DEV_SANDBOX
 ```
 
 ### Execute & See Logs
 ```bash
-sf apex run --file scripts/apex/myScript.apex -o ClaudeTest --log-level DEBUG
+sf apex run --file scripts/apex/myScript.apex -o DEV_SANDBOX --log-level DEBUG
 ```
 
 ---
@@ -118,13 +118,13 @@ private class AccountTriggerHandlerTest {
 ### Run Tests
 ```bash
 # Single class
-sf apex run test --class-names AccountTriggerHandlerTest -o ClaudeTest --result-format human
+sf apex run test --class-names AccountTriggerHandlerTest -o DEV_SANDBOX --result-format human
 
 # All tests
-sf apex run test --test-level RunAllTestsInOrg -o ClaudeTest --result-format human
+sf apex run test --test-level RunAllTestsInOrg -o DEV_SANDBOX --result-format human
 
 # With coverage
-sf apex run test --class-names AccountTriggerHandlerTest -o ClaudeTest --code-coverage --result-format human
+sf apex run test --class-names AccountTriggerHandlerTest -o DEV_SANDBOX --code-coverage --result-format human
 ```
 
 **Target: >75% coverage per class**
@@ -135,7 +135,7 @@ sf apex run test --class-names AccountTriggerHandlerTest -o ClaudeTest --code-co
 
 ### Generate LWC
 ```bash
-sf lightning generate component --name accountCard --type lwc --output-dir force-app/main/default/lwc -o ClaudeTest
+sf lightning generate component --name accountCard --type lwc --output-dir force-app/main/default/lwc -o DEV_SANDBOX
 ```
 
 **Basic Component Structure:**
@@ -159,7 +159,7 @@ export default class AccountCard extends LightningElement {
 
 ### Deploy LWC to Org
 ```bash
-sf project deploy start --source-dir force-app/main/default/lwc/accountCard -o ClaudeTest
+sf project deploy start --source-dir force-app/main/default/lwc/accountCard -o DEV_SANDBOX
 ```
 
 ---
@@ -169,30 +169,30 @@ sf project deploy start --source-dir force-app/main/default/lwc/accountCard -o C
 ### User Management
 ```bash
 # List users
-sf data query --query "SELECT Id, Name, Username, IsActive FROM User LIMIT 50" -o ClaudeTest
+sf data query --query "SELECT Id, Name, Username, IsActive FROM User LIMIT 50" -o DEV_SANDBOX
 
 # Deactivate user (confirm first!)
-sf data update record --sobject User --record-id [USER_ID] --values "IsActive=false" -o ClaudeTest
+sf data update record --sobject User --record-id [USER_ID] --values "IsActive=false" -o DEV_SANDBOX
 
 # Assign Permission Set
-sf org assign permset --name My_Permission_Set --on-behalf-of user@example.com -o ClaudeTest
+sf org assign permset --name My_Permission_Set --on-behalf-of user@example.com -o DEV_SANDBOX
 ```
 
 ### Retrieve Metadata for Editing
 ```bash
 # Retrieve custom field
-sf project retrieve start --metadata "CustomField:Account.My_Field__c" -o ClaudeTest
+sf project retrieve start --metadata "CustomField:Account.My_Field__c" -o DEV_SANDBOX
 
 # Retrieve picklist (custom object)
-sf project retrieve start --metadata "CustomObject:My_Object__c" -o ClaudeTest
+sf project retrieve start --metadata "CustomObject:My_Object__c" -o DEV_SANDBOX
 
 # Retrieve Flow
-sf project retrieve start --metadata "Flow:Account_Assignment_Flow" -o ClaudeTest
+sf project retrieve start --metadata "Flow:Account_Assignment_Flow" -o DEV_SANDBOX
 ```
 
 ### Push Changes Back
 ```bash
-sf project deploy start --source-dir force-app/main/default/objects/Account -o ClaudeTest
+sf project deploy start --source-dir force-app/main/default/objects/Account -o DEV_SANDBOX
 ```
 
 ---
@@ -202,7 +202,7 @@ sf project deploy start --source-dir force-app/main/default/objects/Account -o C
 **`FIELD_CUSTOM_VALIDATION_EXCEPTION`**
 → A validation rule is blocking the DML. Find it via Tooling API:
 ```bash
-sf data query --query "SELECT Id, Active, Description FROM ValidationRule WHERE EntityDefinition.QualifiedApiName = 'Account'" --use-tooling-api -o ClaudeTest
+sf data query --query "SELECT Id, Active, Description FROM ValidationRule WHERE EntityDefinition.QualifiedApiName = 'Account'" --use-tooling-api -o DEV_SANDBOX
 ```
 
 **`System.LimitException: Too many SOQL queries: 101`**
@@ -215,10 +215,10 @@ sf data query --query "SELECT Id, Active, Description FROM ValidationRule WHERE 
 → Deactivate the Flow/Process Builder first, then deploy, then reactivate.
 
 **`Compile error: Variable does not exist`**
-→ Check API names (case-sensitive). Use `sf schema describe sobject --sobject Account -o ClaudeTest` to verify field names.
+→ Check API names (case-sensitive). Use `sf schema describe sobject --sobject Account -o DEV_SANDBOX` to verify field names.
 
 **`Test coverage: 0%` after deploy**
-→ Run `sf apex run test --test-level RunLocalTests -o ClaudeTest` to regenerate coverage data.
+→ Run `sf apex run test --test-level RunLocalTests -o DEV_SANDBOX` to regenerate coverage data.
 
 **`LWC: [Cannot read properties of undefined]`**
 → Add null-check: use optional chaining `?.` and nullish coalescing `??` before accessing nested properties.
@@ -229,7 +229,7 @@ sf data query --query "SELECT Id, Active, Description FROM ValidationRule WHERE 
 
 - One trigger per object — always use the handler pattern
 - No SOQL or DML inside loops — always bulkify
-- Always specify `-o ClaudeTest` — never trust defaults
+- Always specify `-o DEV_SANDBOX` — never trust defaults
 - Test classes: use `@TestSetup`, assert with `Assert.areEqual()` (not `System.assertEquals`)
 - Before deactivating users or deleting records: ask for confirmation
 - Retrieve metadata before editing locally — never edit blind

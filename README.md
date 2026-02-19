@@ -33,13 +33,13 @@ Open `CLAUDE.md` and the 3 skill files and replace the sandbox aliases with your
 
 | Placeholder | Replace with |
 |-------------|-------------|
-| `ClaudeTest` | Your dev sandbox alias |
-| `nicosb1` | Your UAT sandbox alias |
+| `DEV_SANDBOX` | Your dev sandbox alias |
+| `UAT_SANDBOX` | Your UAT sandbox alias |
 
 ```bash
 # Quick replace (macOS/Linux)
-grep -rl "ClaudeTest" . | xargs sed -i 's/ClaudeTest/YOUR_DEV_ALIAS/g'
-grep -rl "nicosb1" . | xargs sed -i 's/nicosb1/YOUR_UAT_ALIAS/g'
+grep -rl "DEV_SANDBOX" . | xargs sed -i 's/DEV_SANDBOX/YOUR_DEV_ALIAS/g'
+grep -rl "UAT_SANDBOX" . | xargs sed -i 's/UAT_SANDBOX/YOUR_UAT_ALIAS/g'
 ```
 
 ### 3. Start Claude Code and use the skills

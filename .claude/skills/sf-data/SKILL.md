@@ -13,13 +13,13 @@ and analyze data quality. You work read-first — always query before modifying.
 
 ## Org Context
 
-- **ClaudeTest** — Dev Sandbox (primary workspace)
-- **nicosb1** — UAT Sandbox
+- **DEV_SANDBOX** — Dev Sandbox (primary workspace)
+- **UAT_SANDBOX** — UAT Sandbox
 - **Production** — Team Lead only — never modify directly
 - **API Version:** 62.0 | **Org Type:** Sales Cloud + Service Cloud
 
 ### Security Rules
-- Always specify `-o ClaudeTest` — never trust defaults
+- Always specify `-o DEV_SANDBOX` — never trust defaults
 - No PII/real customer data in prompts — use synthetic data or anonymized exports
 - For Delete/Truncate operations: ALWAYS ask for confirmation first
 - ALWAYS include LIMIT in SOQL queries
@@ -30,37 +30,37 @@ and analyze data quality. You work read-first — always query before modifying.
 
 ### Basic Query
 ```bash
-sf data query --query "SELECT Id, Name, Industry, OwnerId FROM Account WHERE IsDeleted = false LIMIT 100" -o ClaudeTest
+sf data query --query "SELECT Id, Name, Industry, OwnerId FROM Account WHERE IsDeleted = false LIMIT 100" -o DEV_SANDBOX
 ```
 
 ### Query with Output to CSV
 ```bash
-sf data query --query "SELECT Id, Name, Email, Phone FROM Contact WHERE AccountId != null LIMIT 1000" --result-format csv -o ClaudeTest > contacts_export.csv
+sf data query --query "SELECT Id, Name, Email, Phone FROM Contact WHERE AccountId != null LIMIT 1000" --result-format csv -o DEV_SANDBOX > contacts_export.csv
 ```
 
 ### Cross-Object Query
 ```bash
-sf data query --query "SELECT Id, Name, Account.Name, Account.Industry FROM Contact WHERE Account.Industry = 'Technology' LIMIT 200" -o ClaudeTest
+sf data query --query "SELECT Id, Name, Account.Name, Account.Industry FROM Contact WHERE Account.Industry = 'Technology' LIMIT 200" -o DEV_SANDBOX
 ```
 > Watch the 50,000 query rows limit for cross-object queries.
 
 ### Tooling API (Metadata Queries)
 ```bash
 # Find all custom fields on Account
-sf data query --query "SELECT Id, QualifiedApiName, Label, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Account' LIMIT 200" --use-tooling-api -o ClaudeTest
+sf data query --query "SELECT Id, QualifiedApiName, Label, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Account' LIMIT 200" --use-tooling-api -o DEV_SANDBOX
 
 # Find active Flows
-sf data query --query "SELECT Id, ApiName, Label, Status FROM FlowDefinitionView WHERE Status = 'Active' LIMIT 50" --use-tooling-api -o ClaudeTest
+sf data query --query "SELECT Id, ApiName, Label, Status FROM FlowDefinitionView WHERE Status = 'Active' LIMIT 50" --use-tooling-api -o DEV_SANDBOX
 ```
 
 ### FLS-Safe Query
 ```bash
-sf data query --query "SELECT Id, Name FROM Account WITH SECURITY_ENFORCED LIMIT 100" -o ClaudeTest
+sf data query --query "SELECT Id, Name FROM Account WITH SECURITY_ENFORCED LIMIT 100" -o DEV_SANDBOX
 ```
 
 ### Aggregate Query
 ```bash
-sf data query --query "SELECT OwnerId, COUNT(Id) cnt FROM Opportunity WHERE StageName = 'Closed Won' GROUP BY OwnerId ORDER BY cnt DESC LIMIT 20" -o ClaudeTest
+sf data query --query "SELECT OwnerId, COUNT(Id) cnt FROM Opportunity WHERE StageName = 'Closed Won' GROUP BY OwnerId ORDER BY cnt DESC LIMIT 20" -o DEV_SANDBOX
 ```
 
 ---
@@ -69,16 +69,16 @@ sf data query --query "SELECT OwnerId, COUNT(Id) cnt FROM Opportunity WHERE Stag
 
 ### Single Record Insert
 ```bash
-sf data create record --sobject Account --values "Name='Test GmbH' Industry='Technology'" -o ClaudeTest
+sf data create record --sobject Account --values "Name='Test GmbH' Industry='Technology'" -o DEV_SANDBOX
 ```
 
 ### Bulk Import from CSV
 ```bash
 # Insert
-sf data import bulk --sobject Account --file accounts.csv --wait 10 -o ClaudeTest
+sf data import bulk --sobject Account --file accounts.csv --wait 10 -o DEV_SANDBOX
 
 # Upsert (external ID field)
-sf data upsert bulk --sobject Account --file accounts.csv --external-id External_Id__c --wait 10 -o ClaudeTest
+sf data upsert bulk --sobject Account --file accounts.csv --external-id External_Id__c --wait 10 -o DEV_SANDBOX
 ```
 
 **CSV Format Example (`accounts.csv`):**
@@ -90,7 +90,7 @@ Sample AG,Finance,+49 30 98765,https://sample.de
 
 ### Check Bulk Job Status
 ```bash
-sf data bulk results --job-id [JOB_ID] -o ClaudeTest
+sf data bulk results --job-id [JOB_ID] -o DEV_SANDBOX
 ```
 
 ---
@@ -123,10 +123,10 @@ sf plugins install sfdmu
 ### Run SFDMU Migration
 ```bash
 # Export from source
-sf sfdmu run --sourceusername ClaudeTest --targetusername nicosb1 --path ./migration
+sf sfdmu run --sourceusername DEV_SANDBOX --targetusername UAT_SANDBOX --path ./migration
 ```
 
-> Always test with `--sourceusername ClaudeTest` first before touching nicosb1.
+> Always test with `--sourceusername DEV_SANDBOX` first before touching UAT_SANDBOX.
 
 ---
 
@@ -134,16 +134,16 @@ sf sfdmu run --sourceusername ClaudeTest --targetusername nicosb1 --path ./migra
 
 ### Export Records to JSON
 ```bash
-sf data query --query "SELECT Id, Name, CreatedDate FROM Account LIMIT 500" --result-format json -o ClaudeTest > backup_accounts.json
+sf data query --query "SELECT Id, Name, CreatedDate FROM Account LIMIT 500" --result-format json -o DEV_SANDBOX > backup_accounts.json
 ```
 
 ### Export with All Fields (via describe)
 ```bash
 # Step 1: Get all field names
-sf schema describe sobject --sobject Account -o ClaudeTest
+sf schema describe sobject --sobject Account -o DEV_SANDBOX
 
 # Step 2: Build query with needed fields, then export
-sf data query --query "SELECT Id, Name, Phone, Website, Industry, OwnerId FROM Account LIMIT 500" --result-format csv -o ClaudeTest > accounts_full.csv
+sf data query --query "SELECT Id, Name, Phone, Website, Industry, OwnerId FROM Account LIMIT 500" --result-format csv -o DEV_SANDBOX > accounts_full.csv
 ```
 
 ---
@@ -152,28 +152,28 @@ sf data query --query "SELECT Id, Name, Phone, Website, Industry, OwnerId FROM A
 
 ### Find Records with Empty Fields
 ```bash
-sf data query --query "SELECT Id, Name FROM Account WHERE Phone = null AND Industry = null LIMIT 200" -o ClaudeTest
+sf data query --query "SELECT Id, Name FROM Account WHERE Phone = null AND Industry = null LIMIT 200" -o DEV_SANDBOX
 ```
 
 ### Find Duplicates (by Name)
 ```bash
-sf data query --query "SELECT Name, COUNT(Id) cnt FROM Account GROUP BY Name HAVING COUNT(Id) > 1 ORDER BY cnt DESC LIMIT 50" -o ClaudeTest
+sf data query --query "SELECT Name, COUNT(Id) cnt FROM Account GROUP BY Name HAVING COUNT(Id) > 1 ORDER BY cnt DESC LIMIT 50" -o DEV_SANDBOX
 ```
 
 ### Find Orphaned Records
 ```bash
 # Contacts without Account
-sf data query --query "SELECT Id, LastName, Email FROM Contact WHERE AccountId = null LIMIT 200" -o ClaudeTest
+sf data query --query "SELECT Id, LastName, Email FROM Contact WHERE AccountId = null LIMIT 200" -o DEV_SANDBOX
 
 # Opportunities without Owner
-sf data query --query "SELECT Id, Name FROM Opportunity WHERE OwnerId = null LIMIT 100" -o ClaudeTest
+sf data query --query "SELECT Id, Name FROM Opportunity WHERE OwnerId = null LIMIT 100" -o DEV_SANDBOX
 ```
 
 ### Count Records per Object
 ```bash
-sf data query --query "SELECT COUNT(Id) FROM Account" -o ClaudeTest
-sf data query --query "SELECT COUNT(Id) FROM Contact" -o ClaudeTest
-sf data query --query "SELECT COUNT(Id) FROM Opportunity WHERE IsClosed = false" -o ClaudeTest
+sf data query --query "SELECT COUNT(Id) FROM Account" -o DEV_SANDBOX
+sf data query --query "SELECT COUNT(Id) FROM Contact" -o DEV_SANDBOX
+sf data query --query "SELECT COUNT(Id) FROM Opportunity WHERE IsClosed = false" -o DEV_SANDBOX
 ```
 
 ---
@@ -183,13 +183,13 @@ sf data query --query "SELECT COUNT(Id) FROM Opportunity WHERE IsClosed = false"
 ### Delete Single Record
 ```bash
 # ALWAYS confirm with user before running!
-sf data delete record --sobject Account --record-id [RECORD_ID] -o ClaudeTest
+sf data delete record --sobject Account --record-id [RECORD_ID] -o DEV_SANDBOX
 ```
 
 ### Bulk Delete via Query
 ```bash
 # ALWAYS confirm with user before running!
-sf data delete bulk --sobject Account --where "Name = 'Test GmbH'" -o ClaudeTest
+sf data delete bulk --sobject Account --where "Name = 'Test GmbH'" -o DEV_SANDBOX
 ```
 
 ---
@@ -208,7 +208,7 @@ sf data delete bulk --sobject Account --where "Name = 'Test GmbH'" -o ClaudeTest
 **Bulk import: `FIELD_CUSTOM_VALIDATION_EXCEPTION` on many rows**
 → Export the failed rows from the job results, fix the data, re-import only failures:
 ```bash
-sf data bulk results --job-id [JOB_ID] -o ClaudeTest
+sf data bulk results --job-id [JOB_ID] -o DEV_SANDBOX
 ```
 
 **SFDMU: `Cannot find object in target org`**
@@ -220,7 +220,7 @@ sf data bulk results --job-id [JOB_ID] -o ClaudeTest
 **`CSV import: CRLF line ending issues` (Windows)**
 → Save CSV with LF line endings. Use Apex Anonymous as alternative for small datasets:
 ```bash
-sf apex run --file scripts/apex/insertRecords.apex -o ClaudeTest
+sf apex run --file scripts/apex/insertRecords.apex -o DEV_SANDBOX
 ```
 
 ---

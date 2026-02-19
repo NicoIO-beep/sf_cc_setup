@@ -13,10 +13,10 @@ Production deploys are NEVER done by Claude — team lead only.
 
 ## Org Context
 
-- **ClaudeTest** — Dev Sandbox (source for team deploys)
-- **nicosb1** — UAT Sandbox (Team Lead validates here)
+- **DEV_SANDBOX** — Dev Sandbox (source for team deploys)
+- **UAT_SANDBOX** — UAT Sandbox (Team Lead validates here)
 - **Production** — Team Lead ONLY — never deploy here
-- **Pipeline:** ClaudeTest → nicosb1 → Production
+- **Pipeline:** DEV_SANDBOX → UAT_SANDBOX → Production
 - **API Version:** 62.0 | **Org Type:** Sales Cloud + Service Cloud
 
 ### Security Rules
@@ -60,40 +60,40 @@ When a user asks "what's ready for production" or "show open deployments":
 ### Step 1: Validate (Dry Run)
 ```bash
 # Validate without deploying
-sf project deploy validate --source-dir force-app -o nicosb1 --test-level RunLocalTests
+sf project deploy validate --source-dir force-app -o UAT_SANDBOX --test-level RunLocalTests
 ```
 
-### Step 2: Deploy to nicosb1 (UAT)
+### Step 2: Deploy to UAT_SANDBOX (UAT)
 ```bash
 # Deploy specific metadata
-sf project deploy start --metadata "ApexClass:AccountTriggerHandler" -o nicosb1
+sf project deploy start --metadata "ApexClass:AccountTriggerHandler" -o UAT_SANDBOX
 
 # Deploy entire source
-sf project deploy start --source-dir force-app/main/default -o nicosb1 --test-level RunLocalTests --wait 30
+sf project deploy start --source-dir force-app/main/default -o UAT_SANDBOX --test-level RunLocalTests --wait 30
 ```
 
 ### Step 3: Deploy specific components
 ```bash
 # Apex Class + Trigger together
-sf project deploy start --metadata "ApexClass:AccountTriggerHandler,ApexTrigger:AccountTrigger" -o nicosb1
+sf project deploy start --metadata "ApexClass:AccountTriggerHandler,ApexTrigger:AccountTrigger" -o UAT_SANDBOX
 
 # LWC Component
-sf project deploy start --metadata "LightningComponentBundle:accountCard" -o nicosb1
+sf project deploy start --metadata "LightningComponentBundle:accountCard" -o UAT_SANDBOX
 
 # Flow
-sf project deploy start --metadata "Flow:Account_Assignment_Flow" -o nicosb1
+sf project deploy start --metadata "Flow:Account_Assignment_Flow" -o UAT_SANDBOX
 
 # Custom Field
-sf project deploy start --metadata "CustomField:Account.My_Field__c" -o nicosb1
+sf project deploy start --metadata "CustomField:Account.My_Field__c" -o UAT_SANDBOX
 ```
 
 ### Step 4: Verify Deployment
 ```bash
 # Check last deploy status
-sf project deploy report -o nicosb1
+sf project deploy report -o UAT_SANDBOX
 
 # Verify Apex class exists
-sf data query --query "SELECT Id, Name, Status FROM ApexClass WHERE Name = 'AccountTriggerHandler' LIMIT 1" --use-tooling-api -o nicosb1
+sf data query --query "SELECT Id, Name, Status FROM ApexClass WHERE Name = 'AccountTriggerHandler' LIMIT 1" --use-tooling-api -o UAT_SANDBOX
 ```
 
 ### Deploy from Git Diff (only changed files)
@@ -102,7 +102,7 @@ sf data query --query "SELECT Id, Name, Status FROM ApexClass WHERE Name = 'Acco
 git diff --name-only main HEAD
 
 # Deploy only changed metadata
-sf project deploy start --metadata "ApexClass:AccountTriggerHandler,ApexClass:AccountTriggerHandlerTest" -o nicosb1
+sf project deploy start --metadata "ApexClass:AccountTriggerHandler,ApexClass:AccountTriggerHandlerTest" -o UAT_SANDBOX
 ```
 
 ---
@@ -112,16 +112,16 @@ sf project deploy start --metadata "ApexClass:AccountTriggerHandler,ApexClass:Ac
 ### Retrieve from Org
 ```bash
 # Single component
-sf project retrieve start --metadata "ApexClass:AccountTriggerHandler" -o ClaudeTest
+sf project retrieve start --metadata "ApexClass:AccountTriggerHandler" -o DEV_SANDBOX
 
 # Entire object (fields, layouts, triggers)
-sf project retrieve start --metadata "CustomObject:Account" -o ClaudeTest
+sf project retrieve start --metadata "CustomObject:Account" -o DEV_SANDBOX
 
 # All Flows
-sf project retrieve start --metadata "Flow" -o ClaudeTest
+sf project retrieve start --metadata "Flow" -o DEV_SANDBOX
 
 # Multiple types
-sf project retrieve start --metadata "ApexClass,ApexTrigger,CustomObject" -o ClaudeTest
+sf project retrieve start --metadata "ApexClass,ApexTrigger,CustomObject" -o DEV_SANDBOX
 ```
 
 ### Generate Package.xml for Deployment
@@ -140,26 +140,26 @@ sf org list
 
 ### Create Sandbox
 ```bash
-sf org create sandbox --name NewDevSandbox --clone ClaudeTest --target-org Production --wait 30
+sf org create sandbox --name NewDevSandbox --clone DEV_SANDBOX --target-org Production --wait 30
 ```
 > Sandbox creation targets Production — inform team lead before running!
 
 ### Refresh Sandbox
 ```bash
-sf org refresh sandbox --name ClaudeTest --target-org Production
+sf org refresh sandbox --name DEV_SANDBOX --target-org Production
 ```
 > Confirm with user: refresh wipes all data and config changes in the sandbox!
 
 ### Open Org in Browser
 ```bash
-sf org open -o ClaudeTest
-sf org open -o nicosb1
+sf org open -o DEV_SANDBOX
+sf org open -o UAT_SANDBOX
 ```
 
 ### Check Org Auth Status
 ```bash
 sf org list auth
-sf org display -o ClaudeTest
+sf org display -o DEV_SANDBOX
 ```
 
 ---
@@ -169,33 +169,33 @@ sf org display -o ClaudeTest
 ### Who Has Access to an Object/Field
 ```bash
 # Profiles with access to Account
-sf data query --query "SELECT Id, Name FROM Profile" -o ClaudeTest
+sf data query --query "SELECT Id, Name FROM Profile" -o DEV_SANDBOX
 
 # Permission Sets assigned to users
-sf data query --query "SELECT Id, PermissionSet.Name, Assignee.Name FROM PermissionSetAssignment WHERE PermissionSet.IsOwnedByProfile = false LIMIT 100" -o ClaudeTest
+sf data query --query "SELECT Id, PermissionSet.Name, Assignee.Name FROM PermissionSetAssignment WHERE PermissionSet.IsOwnedByProfile = false LIMIT 100" -o DEV_SANDBOX
 
 # FLS: which fields a profile can see (via Tooling API)
-sf data query --query "SELECT SobjectType, Field, PermissionsRead, PermissionsEdit FROM FieldPermissions WHERE ParentId IN (SELECT Id FROM PermissionSet WHERE Name = 'My_Permission_Set') LIMIT 100" --use-tooling-api -o ClaudeTest
+sf data query --query "SELECT SobjectType, Field, PermissionsRead, PermissionsEdit FROM FieldPermissions WHERE ParentId IN (SELECT Id FROM PermissionSet WHERE Name = 'My_Permission_Set') LIMIT 100" --use-tooling-api -o DEV_SANDBOX
 ```
 
 ### Login History
 ```bash
-sf data query --query "SELECT UserId, LoginTime, LoginType, SourceIp, Status FROM LoginHistory ORDER BY LoginTime DESC LIMIT 100" -o ClaudeTest
+sf data query --query "SELECT UserId, LoginTime, LoginType, SourceIp, Status FROM LoginHistory ORDER BY LoginTime DESC LIMIT 100" -o DEV_SANDBOX
 ```
 
 ### Failed Login Attempts
 ```bash
-sf data query --query "SELECT UserId, LoginTime, SourceIp, Status FROM LoginHistory WHERE Status != 'Success' ORDER BY LoginTime DESC LIMIT 50" -o ClaudeTest
+sf data query --query "SELECT UserId, LoginTime, SourceIp, Status FROM LoginHistory WHERE Status != 'Success' ORDER BY LoginTime DESC LIMIT 50" -o DEV_SANDBOX
 ```
 
 ### Active Users Without Login (90 days)
 ```bash
-sf data query --query "SELECT Id, Name, Username, LastLoginDate FROM User WHERE IsActive = true AND LastLoginDate < LAST_N_DAYS:90 LIMIT 100" -o ClaudeTest
+sf data query --query "SELECT Id, Name, Username, LastLoginDate FROM User WHERE IsActive = true AND LastLoginDate < LAST_N_DAYS:90 LIMIT 100" -o DEV_SANDBOX
 ```
 
 ### Sharing Rules & Org-Wide Defaults
 ```bash
-sf data query --query "SELECT SobjectType, DefaultInternalAccess, DefaultExternalAccess FROM EntityDefinition WHERE IsCustomizable = true LIMIT 50" --use-tooling-api -o ClaudeTest
+sf data query --query "SELECT SobjectType, DefaultInternalAccess, DefaultExternalAccess FROM EntityDefinition WHERE IsCustomizable = true LIMIT 50" --use-tooling-api -o DEV_SANDBOX
 ```
 
 ---
@@ -206,7 +206,7 @@ sf data query --query "SELECT SobjectType, DefaultInternalAccess, DefaultExterna
 ```bash
 # Create destructiveChanges.xml
 # (always confirm with user before executing!)
-sf project deploy start --manifest destructiveChanges.xml -o ClaudeTest --test-level NoTestRun
+sf project deploy start --manifest destructiveChanges.xml -o DEV_SANDBOX --test-level NoTestRun
 ```
 
 **destructiveChanges.xml format:**
@@ -226,31 +226,31 @@ sf project deploy start --manifest destructiveChanges.xml -o ClaudeTest --test-l
 ## 6. Common Errors & Solutions
 
 **`Deploy failed: Test coverage is 0%`**
-→ Run tests in ClaudeTest first: `sf apex run test --test-level RunLocalTests -o ClaudeTest`. Deploy only after coverage is green.
+→ Run tests in DEV_SANDBOX first: `sf apex run test --test-level RunLocalTests -o DEV_SANDBOX`. Deploy only after coverage is green.
 
 **`Cannot deploy: component is in use`**
 → A Flow or Process Builder references the component. Deactivate the Flow first, deploy, then reactivate.
 
 **`Insufficient access rights on cross-reference id`**
-→ The target org is missing a referenced record (e.g., RecordType, User). Check if dependencies exist in nicosb1.
+→ The target org is missing a referenced record (e.g., RecordType, User). Check if dependencies exist in UAT_SANDBOX.
 
 **`Sandbox refresh: all data will be lost`**
 → This is expected — confirm with the user before proceeding. Export any needed data first via `/data`.
 
 **`UNKNOWN_EXCEPTION during deploy`**
-→ Often a timeout. Check status with `sf project deploy report -o nicosb1`. Re-run if it failed mid-deploy.
+→ Often a timeout. Check status with `sf project deploy report -o UAT_SANDBOX`. Re-run if it failed mid-deploy.
 
 **`Cannot retrieve: Metadata type not supported in source format`**
 → Some metadata types (e.g., Profiles) require special handling. Use `--metadata-api-version 62.0` flag or retrieve via package.xml.
 
 **`sf org list auth: No orgs found`**
-→ Re-authenticate: `sf org login web --alias ClaudeTest`. Check VPN if org is not reachable.
+→ Re-authenticate: `sf org login web --alias DEV_SANDBOX`. Check VPN if org is not reachable.
 
 ---
 
 ## Working Instructions
 
-- Always validate before deploying to nicosb1 (`--dry-run` or `--test-level RunLocalTests`)
+- Always validate before deploying to UAT_SANDBOX (`--dry-run` or `--test-level RunLocalTests`)
 - Never deploy directly to Production — tell the team lead and hand off
 - Before sandbox refresh: warn user that data will be wiped, ask for confirmation
 - For destructive changes: show what will be deleted, ask for confirmation
