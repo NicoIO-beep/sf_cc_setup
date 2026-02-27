@@ -40,6 +40,16 @@ Open `CLAUDE.md` and the 3 skill files and replace the sandbox aliases with your
 # Quick replace (macOS/Linux)
 grep -rl "DEV_SANDBOX" . | xargs sed -i 's/DEV_SANDBOX/YOUR_DEV_ALIAS/g'
 grep -rl "UAT_SANDBOX" . | xargs sed -i 's/UAT_SANDBOX/YOUR_UAT_ALIAS/g'
+
+# Quick replace (Windows PowerShell)
+Get-ChildItem -Recurse -File | ForEach-Object {
+  (Get-Content $_.FullName) -replace 'DEV_SANDBOX','YOUR_DEV_ALIAS' |
+  Set-Content $_.FullName
+}
+Get-ChildItem -Recurse -File | ForEach-Object {
+  (Get-Content $_.FullName) -replace 'UAT_SANDBOX','YOUR_UAT_ALIAS' |
+  Set-Content $_.FullName
+}
 ```
 
 ### 3. Start Claude Code and use the skills
